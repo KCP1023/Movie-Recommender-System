@@ -33,3 +33,18 @@ Key observations:
 Plot descriptions are sufficiently detailed for text-based retrieval
 Dataset contains diverse genres with mild imbalance
 Raw text contains high-frequency noise words, justifying preprocessing
+
+# TF-IDF Retrieval
+
+Example query search:
+```
+python tfidf_retrieval.py --query "a sponge makes friends underwater"
+
+```
+
+Example seed-movie recommendations:
+```
+python tfidf_retrieval.py --seed-title "Spongebob"
+
+```
+
