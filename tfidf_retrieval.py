@@ -8,7 +8,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 # just hardcoded for milestone 1
 DATA_FILE = Path("cleaned_imdb_dataset.csv")
-TEXT_COLUMN = "clean_description"
+TEXT_COLUMN = "document_text_v3"
 TOP_K = 5
 
 

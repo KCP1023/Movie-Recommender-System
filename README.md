@@ -42,9 +42,16 @@ python tfidf_retrieval.py --query "a sponge makes friends underwater"
 
 ```
 
+```
+python tfidf_retrieval.py --query "a crime drama on sheby family prohibition"
+```
+
 Example seed-movie recommendations:
 ```
 python tfidf_retrieval.py --seed-title "Spongebob"
 
 ```
 
+```
+python tfidf_retrieval.py --seed-title "Peaky Blinders"
+```i
