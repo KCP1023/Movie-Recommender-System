@@ -68,6 +68,24 @@ def normalize_metadata_text(text):
     text = re.sub(r"[^\w\s]", " ", text, flags=re.UNICODE)
     return " ".join(text.split())
 
+CAST_NOISE = {"star", "stars", "actor", "actors"}
+def format_clean_cast(movie):
+    clean_cast = movie.get("clean_stars", "") or ""
+
+    if clean_cast:
+        seen = set()
+        cleaned_tokens = []
+        for token in clean_cast.split():
+            token = token.lower().strip()
+            if token in CAST_NOISE:
+                continue
+            if token not in seen:
+                seen.add(token)
+                cleaned_tokens.append(token)
+
+        return ", ".join(cleaned_tokens)
+
+    return format_cast(movie.get("stars", "") or "")
 
 def format_cast(raw_cast):
     if not raw_cast:
@@ -79,13 +97,24 @@ def format_cast(raw_cast):
         cast_members = None
 
     if isinstance(cast_members, list):
-        cleaned_members = [str(member).strip(" ,") for member in cast_members if str(member).strip(" ,")]
-        if cleaned_members:
-            return ", ".join(cleaned_members)
+        cleaned_members = []
+        for member in cast_members:
+            member = str(member)
+            member = member.replace("|", " ")
+            member = re.sub(r"\bStars?:\s*", " ", member, flags=re.IGNORECASE)
+            member = re.sub(r"\s+", " ", member).strip(" ,")
+            if member:
+                cleaned_members.append(member)
+        return ", ".join(cleaned_members)
 
-    cleaned_text = raw_cast.replace("[", "").replace("]", "").replace("'", "")
+    cleaned_text = str(raw_cast)
+    cleaned_text = cleaned_text.replace("[", "").replace("]", "").replace("'", "")
+    cleaned_text = cleaned_text.replace("|", ",")
+    cleaned_text = re.sub(r"\bStars?:\s*", "", cleaned_text, flags=re.IGNORECASE)
     cleaned_text = re.sub(r"\s*,\s*", ", ", cleaned_text)
+    cleaned_text = re.sub(r"(,\s*)+", ", ", cleaned_text)
     cleaned_text = re.sub(r"\s+", " ", cleaned_text)
+
     return cleaned_text.strip(" ,")
 
 
@@ -99,9 +128,9 @@ def build_search_indexes(movies):
     index_inputs = {
         "query": [movie.get(TEXT_COLUMN, "") or "" for movie in movies],
         "title": [normalize_metadata_text(movie.get("title", "") or "") for movie in movies],
-        "genre": [normalize_metadata_text(movie.get("genre", "") or "") for movie in movies],
-        "cast": [normalize_metadata_text(format_cast(movie.get("stars", "") or "")) for movie in movies],
-    }
+        "genre": [normalize_metadata_text(movie.get("clean_genre", "") or "") for movie in movies],
+        "cast": [normalize_metadata_text(format_clean_cast(movie)) for movie in movies],
+        }
 
     indexes = {}
     for field_name, config in SEARCH_INDEX_CONFIGS.items():
@@ -123,7 +152,20 @@ def top_shared_terms(vector_a, vector_b, feature_names, top_n=5):
 
     coo = shared.tocoo()
     ranked = sorted(zip(coo.col, coo.data), key=lambda item: item[1], reverse=True)[:top_n]
-    return [(feature_names[idx], score) for idx, score in ranked]
+    
+    NOISY_TERMS = {"star", "stars", "cast", "actor", "actors"}
+
+    terms = []
+    for idx, score in ranked:
+        term = feature_names[idx]
+        term_tokens = set(term.split())
+
+        if term_tokens & NOISY_TERMS:
+            continue
+        terms.append((term, score))
+        if len(terms) == top_n:
+            break
+    return terms
 
 
 def find_movie_index(movies, seed_title):
@@ -162,19 +204,32 @@ def format_results(header, results):
             print(f"   matched fields: {field_scores}")
         if result["matched_terms"]:
             for field_name, terms in result["matched_terms"].items():
-                formatted_terms = ", ".join(f"{term} ({score:.3f})" for term, score in terms)
-                print(f"   shared {field_name} terms: {formatted_terms}")
-        print()
+                formatted_terms = ", ".join(
+                f"{item['term']} ({item['score']:.3f})"
+                for item in terms
+            )
+            print(f"   shared {field_name} terms: {formatted_terms}")
 
 
-def collect_results(movies, similarities, field_matches, top_k, skip_idx=None):
-    ranked_indices = similarities.argsort()[::-1][:top_k]
+def collect_results(movies, similarities, field_matches, top_k, skip_idx=None, seed_title=None):
+    ranked_indices = similarities.argsort()[::-1]
     results = []
 
+    seed_title_clean = seed_title.strip().casefold() if seed_title else None
     for idx in ranked_indices:
         if skip_idx is not None and idx == skip_idx:
             continue
+
+        if similarities[idx] <= 0:
+            continue
+
         movie = movies[idx]
+        movie_title_clean = movie.get("title", "").strip().casefold()
+
+        # Skip exact duplicate title matches for seed recommendations
+        if seed_title_clean and movie_title_clean == seed_title_clean:
+            continue
+
         field_scores = {}
         matched_terms = {}
 
@@ -183,32 +238,104 @@ def collect_results(movies, similarities, field_matches, top_k, skip_idx=None):
             if field_score <= 0:
                 continue
 
-            field_scores[field_name] = field_score
+            field_scores[field_name] = float(field_score)
             shared_terms = top_shared_terms(
                 field_match["query_vector"],
                 field_match["matrix"][idx],
                 field_match["vectorizer"].get_feature_names_out(),
             )
+
             if shared_terms:
-                matched_terms[field_name] = shared_terms
+                matched_terms[field_name] = [
+                    {"term": term, "score": float(score)}
+                    for term, score in shared_terms
+                ]
 
         results.append(
             {
+                "idx": int(idx),
                 "title": movie.get("title", "Unknown"),
                 "year": movie.get("year", "Unknown"),
                 "genre": movie.get("genre", ""),
-                "cast": format_cast(movie.get("stars", "")),
+                "cast": format_clean_cast(movie),
                 "description": movie.get("description", ""),
-                "score": similarities[idx],
+                "score": float(similarities[idx]),
                 "field_scores": field_scores,
                 "matched_terms": matched_terms,
             }
         )
+
         if len(results) == top_k:
             break
 
     return results
 
+def build_retrieval_engine(data_file=DATA_FILE):
+    movies = load_movies(Path(data_file))
+    search_indexes = build_search_indexes(movies)
+    return movies, search_indexes
+
+def get_seed_recommendations(seed_title, data_file=DATA_FILE, top_k=TOP_K):
+    movies, search_indexes = build_retrieval_engine(data_file)
+    plot_index = search_indexes["query"]
+
+    seed_idx = find_movie_index(movies, seed_title)
+    seed_movie = movies[seed_idx]
+
+    similarities = cosine_similarity(
+        plot_index["matrix"][seed_idx],
+        plot_index["matrix"]
+    ).ravel()
+
+    similarities[seed_idx] = -1
+
+    field_matches = {
+        "plot": {
+            "vectorizer": plot_index["vectorizer"],
+            "matrix": plot_index["matrix"],
+            "query_vector": plot_index["matrix"][seed_idx],
+            "similarities": similarities,
+        }
+    }
+
+    results = collect_results(
+        movies,
+        similarities,
+        field_matches,
+        top_k,
+        skip_idx=seed_idx,
+        seed_title=seed_movie.get("title", ""),
+    )
+
+    return {
+        "mode": "seed",
+        "seed_idx": seed_idx,
+        "seed_title": seed_movie.get("title", "Unknown"),
+        "seed_year": seed_movie.get("year", "Unknown"),
+        "seed_movie": seed_movie,
+        "results": results,
+    }
+    
+def get_query_results(query=None, title=None, genre=None, cast=None, data_file=DATA_FILE, top_k=TOP_K):
+    movies, search_indexes = build_retrieval_engine(data_file)
+
+    class Args:
+        pass
+
+    args = Args()
+    args.query = query
+    args.title = title
+    args.genre = genre
+    args.cast = cast
+
+    search_requests = build_search_requests(args)
+    results = run_field_search(movies, search_indexes, search_requests, top_k)
+
+    return {
+        "mode": "query",
+        "search_requests": search_requests,
+        "results": results,
+    }
 
 def parse_args():
     parser = argparse.ArgumentParser()
