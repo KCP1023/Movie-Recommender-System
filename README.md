@@ -41,6 +41,7 @@ Example query search:
 python tfidf_retrieval.py --query "a sponge makes friends underwater"
 
 ```
+or
 
 ```
 python tfidf_retrieval.py --query "a crime drama on sheby family prohibition"
@@ -51,7 +52,7 @@ Example seed-movie recommendations:
 python tfidf_retrieval.py --seed-title "Spongebob"
 
 ```
-
+or
 ```
 python tfidf_retrieval.py --seed-title "Peaky Blinders"
 ```
@@ -65,5 +66,11 @@ python topicmodeling_fin.py --text-col document_text_v2 --topics 10 --show-examp
 # Explanation Generation for Recommendation
 
 ```
-python explanation_generator.py --seed-title "Breaking Bad" --text-col document_text_v2 --topics 10 --top-k 5
+python explanation_generator.py --seed-title "Breaking Bad"
+```
+
+or 
+
+```
+python explanation_generator.py --seed-title "Peaky Blinders"
 ```

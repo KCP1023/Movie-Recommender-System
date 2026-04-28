@@ -1,0 +1,314 @@
+{
+  "seed_title": "Peaky Blinders",
+  "seed_idx": 18,
+  "results": [
+    {
+      "seed_title": "Peaky Blinders",
+      "recommended_title": "Happy Valley",
+      "year": "2014.0",
+      "genre": "Crime, Drama, Thriller",
+      "cast": "sarah, lancashire, siobhan, finneran, charlie, murphy, james, norton",
+      "description": "Yorkshire based crime drama centering on the personal and professional life of Police Sergeant Catherine Cawood.",
+      "similarity_score": 0.1973057856042011,
+      "field_scores": {
+        "plot": 0.1973057856042011
+      },
+      "shared_terms": [
+        "centering",
+        "crime drama",
+        "crime",
+        "drama"
+      ],
+      "shared_genres": [
+        "crime",
+        "drama"
+      ],
+      "shared_cast": [],
+      "topic_info": {
+        "seed_topic": {
+          "topic_id": 6,
+          "topic_name": "family / christmas / witch",
+          "topic_keywords": [
+            "family",
+            "christmas",
+            "witch",
+            "fantasy",
+            "animation",
+            "old",
+            "worst",
+            "home",
+            "year",
+            "musical"
+          ],
+          "topic_strength": 0.05963986351099764
+        },
+        "rec_topic": {
+          "topic_id": 8,
+          "topic_name": "crime / thriller / mystery",
+          "topic_keywords": [
+            "crime",
+            "thriller",
+            "mystery",
+            "action",
+            "police",
+            "murder",
+            "killer",
+            "detective",
+            "case",
+            "serial"
+          ],
+          "topic_strength": 0.12004151811787502
+        },
+        "same_topic": false,
+        "topic_similarity": 0.610027231218102,
+        "shared_topic_keywords": []
+      },
+      "explanation": "Happy Valley is recommended because it shares genre overlap in crime and drama; contains similar plot-related terms such as centering, crime drama, and crime; has related topic-level similarity to crime / thriller / mystery with Peaky Blinders."
+    },
+    {
+      "seed_title": "Peaky Blinders",
+      "recommended_title": "Wira",
+      "year": "2019.0",
+      "genre": "Action, Crime, Drama",
+      "cast": "adrian, teh, hairul, azreen, fify, azmi, ismi, melinda, hilal, azman",
+      "description": "After leaving the military, Hassan returns home to help his sister settle a debt to the local gang boss. To do so they must team up to fight the gangster's son and daughter in the ring.",
+      "similarity_score": 0.17246461470052143,
+      "field_scores": {
+        "plot": 0.17246461470052143
+      },
+      "shared_terms": [
+        "gangster",
+        "boss",
+        "gang",
+        "crime drama",
+        "crime"
+      ],
+      "shared_genres": [
+        "crime",
+        "drama"
+      ],
+      "shared_cast": [],
+      "topic_info": {
+        "seed_topic": {
+          "topic_id": 6,
+          "topic_name": "family / christmas / witch",
+          "topic_keywords": [
+            "family",
+            "christmas",
+            "witch",
+            "fantasy",
+            "animation",
+            "old",
+            "worst",
+            "home",
+            "year",
+            "musical"
+          ],
+          "topic_strength": 0.05963986351099764
+        },
+        "rec_topic": {
+          "topic_id": 8,
+          "topic_name": "crime / thriller / mystery",
+          "topic_keywords": [
+            "crime",
+            "thriller",
+            "mystery",
+            "action",
+            "police",
+            "murder",
+            "killer",
+            "detective",
+            "case",
+            "serial"
+          ],
+          "topic_strength": 0.053194654529280704
+        },
+        "same_topic": false,
+        "topic_similarity": 0.6858000694072083,
+        "shared_topic_keywords": []
+      },
+      "explanation": "Wira is recommended because it shares genre overlap in crime and drama; contains similar plot-related terms such as gangster, boss, and gang; has related topic-level similarity to crime / thriller / mystery with Peaky Blinders."
+    },
+    {
+      "seed_title": "Peaky Blinders",
+      "recommended_title": "Shelby American: The Carroll Shelby Story",
+      "year": "2019.0",
+      "genre": "Documentary, Biography, History",
+      "cast": "nate, adams, adam, carolla, charlie, agapiou, chris, amon, mario, andretti, zora, arkus, duntov",
+      "description": "The story of automotive icon Carroll Shelby who started as a chicken farmer and went on to become one of the winningest racing drivers in American motorsports, and the only man in history to win in Le Mans as a driver and a manufacturer.",
+      "similarity_score": 0.16745185448467528,
+      "field_scores": {
+        "plot": 0.16745185448467528
+      },
+      "shared_terms": [
+        "shelby"
+      ],
+      "shared_genres": [],
+      "shared_cast": [],
+      "topic_info": {
+        "seed_topic": {
+          "topic_id": 6,
+          "topic_name": "family / christmas / witch",
+          "topic_keywords": [
+            "family",
+            "christmas",
+            "witch",
+            "fantasy",
+            "animation",
+            "old",
+            "worst",
+            "home",
+            "year",
+            "musical"
+          ],
+          "topic_strength": 0.05963986351099764
+        },
+        "rec_topic": {
+          "topic_id": 9,
+          "topic_name": "history / war / queen",
+          "topic_keywords": [
+            "history",
+            "war",
+            "queen",
+            "conqueror",
+            "catalina",
+            "pedro",
+            "biography",
+            "sol",
+            "constanza",
+            "alberto"
+          ],
+          "topic_strength": 0.11064584724565954
+        },
+        "same_topic": false,
+        "topic_similarity": 0.011869578698661561,
+        "shared_topic_keywords": []
+      },
+      "explanation": "Shelby American: The Carroll Shelby Story is recommended because it contains similar plot-related terms such as shelby with Peaky Blinders."
+    },
+    {
+      "seed_title": "Peaky Blinders",
+      "recommended_title": "Lift",
+      "year": "",
+      "genre": "Action, Crime, Drama",
+      "cast": "f, gary, gray, kevin, hart, vincent, onofrio, sam, worthington, paul, anderson",
+      "description": "Follows a female master thief and her ex-boyfriend who team up to steal $100 million in gold bullion being transported on a 777 passenger flight.",
+      "similarity_score": 0.16438282996963466,
+      "field_scores": {
+        "plot": 0.16438282996963466
+      },
+      "shared_terms": [
+        "crime drama",
+        "crime"
+      ],
+      "shared_genres": [
+        "crime",
+        "drama"
+      ],
+      "shared_cast": [],
+      "topic_info": {
+        "seed_topic": {
+          "topic_id": 6,
+          "topic_name": "family / christmas / witch",
+          "topic_keywords": [
+            "family",
+            "christmas",
+            "witch",
+            "fantasy",
+            "animation",
+            "old",
+            "worst",
+            "home",
+            "year",
+            "musical"
+          ],
+          "topic_strength": 0.05963986351099764
+        },
+        "rec_topic": {
+          "topic_id": 8,
+          "topic_name": "crime / thriller / mystery",
+          "topic_keywords": [
+            "crime",
+            "thriller",
+            "mystery",
+            "action",
+            "police",
+            "murder",
+            "killer",
+            "detective",
+            "case",
+            "serial"
+          ],
+          "topic_strength": 0.04492929024239451
+        },
+        "same_topic": false,
+        "topic_similarity": 0.5648919774311163,
+        "shared_topic_keywords": []
+      },
+      "explanation": "Lift is recommended because it shares genre overlap in crime and drama; contains similar plot-related terms such as crime drama and crime; has related topic-level similarity to crime / thriller / mystery with Peaky Blinders."
+    },
+    {
+      "seed_title": "Peaky Blinders",
+      "recommended_title": "The Great Train Robbery",
+      "year": "2013.0",
+      "genre": "Biography, Crime, Drama",
+      "cast": "robert, glenister, jack, roth, luke, evans, paul, anderson",
+      "description": "A two-part drama which portrays The Great Train Robbery of 8 August 1963, firstly from the point of view of the robbers and then from the point of view of the police who set out to identify and catch the robbers.",
+      "similarity_score": 0.14973619952046702,
+      "field_scores": {
+        "plot": 0.14973619952046702
+      },
+      "shared_terms": [
+        "set",
+        "crime drama"
+      ],
+      "shared_genres": [
+        "crime",
+        "drama"
+      ],
+      "shared_cast": [
+        "paul anderson"
+      ],
+      "topic_info": {
+        "seed_topic": {
+          "topic_id": 6,
+          "topic_name": "family / christmas / witch",
+          "topic_keywords": [
+            "family",
+            "christmas",
+            "witch",
+            "fantasy",
+            "animation",
+            "old",
+            "worst",
+            "home",
+            "year",
+            "musical"
+          ],
+          "topic_strength": 0.05963986351099764
+        },
+        "rec_topic": {
+          "topic_id": 8,
+          "topic_name": "crime / thriller / mystery",
+          "topic_keywords": [
+            "crime",
+            "thriller",
+            "mystery",
+            "action",
+            "police",
+            "murder",
+            "killer",
+            "detective",
+            "case",
+            "serial"
+          ],
+          "topic_strength": 0.029073925677374778
+        },
+        "same_topic": false,
+        "topic_similarity": 0.5785435941856611,
+        "shared_topic_keywords": []
+      },
+      "explanation": "The Great Train Robbery is recommended because it shares genre overlap in crime and drama; features shared cast members such as paul anderson; contains similar plot-related terms such as set and crime drama; has related topic-level similarity to crime / thriller / mystery with Peaky Blinders."
+    }
+  ]
+}

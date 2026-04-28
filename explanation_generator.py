@@ -1,7 +1,8 @@
-# explanation_generator.py
-
 import argparse
 import re
+
+import json
+import csv
 
 from tfidf_retrieval import get_seed_recommendations
 from topicmodeling_fin import train_topic_model, get_pair_topic_info
@@ -51,6 +52,36 @@ def extract_cast_names(cast_text):
     cast_tokens = set(tokens)
     return cast_names, cast_tokens
 
+
+def save_results_json(output, output_path):
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(output, f, indent=2, ensure_ascii=False)
+
+
+def save_results_csv(output, output_path):
+    rows = []
+
+    for rec in output["results"]:
+        rows.append({
+            "seed_title": rec["seed_title"],
+            "recommended_title": rec["recommended_title"],
+            "year": rec["year"],
+            "genre": rec["genre"],
+            "similarity_score": rec["similarity_score"],
+            "shared_genres": ", ".join(rec["shared_genres"]),
+            "shared_cast": ", ".join(rec["shared_cast"]),
+            "shared_terms": ", ".join(rec["shared_terms"]),
+            "topic_similarity": rec["topic_info"]["topic_similarity"],
+            "same_topic": rec["topic_info"]["same_topic"],
+            "explanation": rec["explanation"],
+        })
+
+    with open(output_path, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+        writer.writeheader()
+        writer.writerows(rows)
+        
+        
 def clean_matched_terms(matched_terms, max_terms=5):
     terms = []
 
@@ -115,7 +146,7 @@ def build_explanation(
         parts.append(f"features shared cast members such as {format_list(shared_cast)}")
         
     if shared_terms:
-        parts.append(f"contains similar descriptive terms such as {format_list(shared_terms)}")
+        parts.append(f"contains similar plot-related terms such as {format_list(shared_terms)}")
 
     if topic_info:
         topic_similarity = topic_info.get("topic_similarity")
@@ -246,10 +277,10 @@ def print_explained_results(output):
             print(f"   Shared genres: {', '.join(rec['shared_genres'])}")
 
         if rec["shared_cast"]:
-            print(f"   Shared cast signals: {', '.join(rec['shared_cast'])}")
+            print(f"   Shared cast: {', '.join(rec['shared_cast'])}")
 
         if rec["shared_terms"]:
-            print(f"   Shared terms: {', '.join(rec['shared_terms'])}")
+            print(f"   Shared descriptive terms: {', '.join(rec['shared_terms'])}")
 
         topic_info = rec["topic_info"]
         print(
@@ -266,6 +297,8 @@ def parse_args():
     parser.add_argument("--text-col", default="document_text_v2")
     parser.add_argument("--topics", type=int, default=10)
     parser.add_argument("--top-k", type=int, default=5)
+    parser.add_argument("--save-json", default=None)
+    parser.add_argument("--save-csv", default=None)
     return parser.parse_args()
 
 
@@ -281,6 +314,11 @@ def main():
     )
 
     print_explained_results(output)
+    if args.save_json:
+        save_results_json(output, args.save_json)
+
+    if args.save_csv:
+        save_results_csv(output, args.save_csv)
 
 
 if __name__ == "__main__":

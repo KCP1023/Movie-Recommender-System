@@ -117,6 +117,42 @@ def format_cast(raw_cast):
 
     return cleaned_text.strip(" ,")
 
+def save_results_csv(seed_title, results, output_path):
+    rows = []
+
+    for rank, rec in enumerate(results, start=1):
+        shared_terms = []
+
+        for field_name, items in rec.get("matched_terms", {}).items():
+            for item in items:
+                shared_terms.append(item["term"])
+
+        # remove duplicates, preserve order
+        seen = set()
+        shared_terms_clean = []
+        for term in shared_terms:
+            if term not in seen:
+                seen.add(term)
+                shared_terms_clean.append(term)
+
+        rows.append({
+            "seed_title": seed_title,
+            "rank": rank,
+            "recommended_title": rec.get("title", ""),
+            "year": rec.get("year", ""),
+            "genre": rec.get("genre", ""),
+            "score": rec.get("score", 0.0),
+            "shared_terms": ", ".join(shared_terms_clean),
+            "cast": rec.get("cast", ""),
+            "description": rec.get("description", "")
+        })
+
+    with open(output_path, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+        writer.writeheader()
+        writer.writerows(rows)
+
+    print(f"\nSaved retrieval results to: {output_path}")
 
 def build_index(docs, **vectorizer_kwargs):
     vectorizer = TfidfVectorizer(**vectorizer_kwargs)
@@ -210,25 +246,26 @@ def format_results(header, results):
             )
             print(f"   shared {field_name} terms: {formatted_terms}")
 
+def normalize_title(text):
+    return str(text).strip().casefold()
 
 def collect_results(movies, similarities, field_matches, top_k, skip_idx=None, seed_title=None):
     ranked_indices = similarities.argsort()[::-1]
     results = []
 
-    seed_title_clean = seed_title.strip().casefold() if seed_title else None
+    seed_title_clean = normalize_title(seed_title) if seed_title else None
+
     for idx in ranked_indices:
+        movie = movies[idx]
+        movie_title = movie.get("title", "")
+
         if skip_idx is not None and idx == skip_idx:
             continue
-
         if similarities[idx] <= 0:
             continue
 
-        movie = movies[idx]
-        movie_title_clean = movie.get("title", "").strip().casefold()
-
-        # Skip exact duplicate title matches for seed recommendations
-        if seed_title_clean and movie_title_clean == seed_title_clean:
-            continue
+        if seed_title_clean and normalize_title(movie_title) == seed_title_clean:
+          continue
 
         field_scores = {}
         matched_terms = {}
@@ -304,8 +341,8 @@ def get_seed_recommendations(seed_title, data_file=DATA_FILE, top_k=TOP_K):
         field_matches,
         top_k,
         skip_idx=seed_idx,
-        seed_title=seed_movie.get("title", ""),
-    )
+        seed_title=seed_movie.get("title", "")
+    )   
 
     return {
         "mode": "seed",
@@ -344,6 +381,7 @@ def parse_args():
     parser.add_argument("--genre", help="search by genre")
     parser.add_argument("--cast", help="search by actor or cast member")
     parser.add_argument("--seed-title", help="find recommendations similar to a seed title")
+    parser.add_argument("--save-csv", default=None)
 
     args = parser.parse_args()
 
@@ -442,10 +480,17 @@ def main():
             field_matches,
             TOP_K,
             skip_idx=seed_idx,
+            seed_title=seed_movie.get("title", ""),
         )
 
         print(f"Seed movie: {seed_movie.get('title', 'Unknown')} ({seed_movie.get('year', 'Unknown')})")
         format_results("Top seed-based recommendations", results)
+        if args.save_csv:
+            save_results_csv(
+                seed_title=seed_movie.get("title", ""),
+                results=results,
+                output_path=args.save_csv
+            )
 
 
 if __name__ == "__main__":
