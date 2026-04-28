@@ -59,7 +59,7 @@ python tfidf_retrieval.py --seed-title "Peaky Blinders"
 # Topic Modeling and Building Topics Distribution
 
 ```
-python topicmodeling.py --text-col document_text_v2 --topics 10 --show-examples 
+python topicmodeling_fin.py --text-col document_text_v2 --topics 10 --show-examples 
 ```
 
 # Explanation Generation for Recommendation
