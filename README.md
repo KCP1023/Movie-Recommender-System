@@ -1,5 +1,5 @@
 # Movie Recommender System
-Movie recommendation system on a large IMDB dataset, using movie plot summaries as the primary matching and relevance criteria
+Movie recommendation system on a large IMDB dataset, using movie plot summaries as the primary matching and relevance criteria along with title, genre, and cast information metadata for better contextual information. The ssytem also utilizes topic modeling to better group movies with higher thematic similarity and generates natural language explanations that highlight reasoning behind the recommendations.
 
 # Dataset
 The dataset consists of IMDB movie entries with the following relevant fields:
@@ -36,12 +36,13 @@ Raw text contains high-frequency noise words, justifying preprocessing
 
 # TF-IDF Retrieval
 
-Example query search:
+This module sets up our initial retrieval pipeline to get the top 5 highest ranked recommendations for each seed movie or query. You can run our tf-idf retrieval script in two following ways: one for a natural language search query, or using a seed movie to find similar movie recommendations. We also extract shared descriptive terms, shared genre information, and shared cast signals between the seed movie and each recommendation to obtain actual contextual information that explain the recommendation which is then fed into our explanation generation pipeline.
+
+Example natural language query search:
 ```
 python tfidf_retrieval.py --query "a sponge makes friends underwater"
 
 ```
-or
 
 ```
 python tfidf_retrieval.py --query "a crime drama on sheby family prohibition"
@@ -52,25 +53,37 @@ Example seed-movie recommendations:
 python tfidf_retrieval.py --seed-title "Spongebob"
 
 ```
-or
+
 ```
 python tfidf_retrieval.py --seed-title "Peaky Blinders"
 ```
 
 # Topic Modeling and Building Topics Distribution
 
+Our topic modeling script basically uses the column `document_text_v2` which contains title + description + genre information to group all our movies into a set of 10 topics, and assign each movie a topic similarity score of how similar each movie is to an overarching topic. This is then used to match seed movies to recommendations - if they both have similar dominant topics, and are in the same topic cluster, we get higher thematic similarity and better semantic understanding about our recommendations. We can run our topic modeling script as follows:
+
+`--show-examples` flag gives the output of topic distribution, and the broad topics it has group your dataset under with 5 example movies for each cluster. 
+
 ```
 python topicmodeling_fin.py --text-col document_text_v2 --topics 10 --show-examples 
 ```
 
+
 # Explanation Generation for Recommendation
+
+This module combines all the extracted signals from our tf-idf retrieval pipeline and the dominant topic selection from our topic modeling pipeline to generate explanations for why each movie has been recommended for a particular seed movie. It uses a natural language template and multiple shared signals to generate ranked recommendations with interpretable explanations for a final output that mitigates the "black box aspect" of other recommendation engines and fulfils our objective. We can run our explanation generator script as follows using a `--seed-title` flag for our seed movie. 
 
 ```
 python explanation_generator.py --seed-title "Breaking Bad"
 ```
 
-or 
+
 
 ```
 python explanation_generator.py --seed-title "Peaky Blinders"
 ```
+
+# Evaluation
+
+Our evaluation module checks relevance judgements for the recommendations and explanations with 5 seed movies and its recommendations and 5 query movies and their recommendations. 
+These include metrics like Precision, MRR, and nDCG across all inputs as well as manual grading of whether the movie is relevant or irrelevant.
